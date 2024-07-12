@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "293611537856",
+    "firebase_url": "https://vineyard-guard-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "vineyard-guard",
+    "storage_bucket": "vineyard-guard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293611537856:android:1c6a21f6e32a8fd6e5b425",
+        "android_client_info": {
+          "package_name": "com.example.vineyard_guard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK50Jo5l14bAaEPUk60opEtysMiQEmXJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
