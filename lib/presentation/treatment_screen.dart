@@ -12,10 +12,11 @@ class TreatmentScreen extends StatefulWidget {
 }
 
 class _TreatmentScreenState extends State<TreatmentScreen> {
+  final TreatmentUseCase _useCase = TreatmentUseCase();
   late Future<List<Treatment>> _request;
 
   Future<List<Treatment>> _fetchTreatments() async =>
-      _request = TreatmentUseCase().treatments();
+      _request = _useCase.treatments();
 
   @override
   void initState() {
@@ -46,12 +47,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       ListView.builder(
           itemCount: treatments.length,
           itemBuilder: (context, index) => Dismissible(
-              key: ValueKey(index),
+              key: ValueKey(treatments[index].id),
               background: Container(
                 color: Colors.red,
               ),
               child: _treatmentCard(treatments[index]),
               onDismissed: (_) {
+                _useCase.remove(treatments[index].id);
                 setState(() {
                   treatments.removeAt(index);
                 });

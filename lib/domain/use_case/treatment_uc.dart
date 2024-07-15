@@ -7,6 +7,9 @@ class TreatmentUseCase {
   final TreatmentRepo _repo = TreatmentRepoImpl();
 
   Future<List<Treatment>> treatments() => _repo.treatments();
+
   void add(DateTime date, Map<String, Quantity> pesticides) =>
-      _repo.add(Treatment(date, pesticides));
+      _repo.add(Treatment.autogenerateId(date, pesticides));
+
+  void remove(String id) => _repo.remove(id);
 }

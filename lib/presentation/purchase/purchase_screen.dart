@@ -41,7 +41,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           builder: (context) => const AddPurchaseForm(),
         ));
 
-    Purchase p = Purchase.withIdGeneration(request.pesticide,
+    Purchase p = Purchase.autogenerateId(request.pesticide,
         Quantity(request.amount, request.unit), request.price);
     _useCase.add(p);
     setState(() {
@@ -67,16 +67,14 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             color: Colors.red,
           ),
           key: ValueKey(_purchases[index].id),
-          onDismissed: (_) => _removePurchase(index),
+          onDismissed: (_) {
+            setState(() {
+              _purchases.removeAt(index);
+            });
+            _useCase.remove(_purchases[index].id);
+          },
           child: _purchaseCard(_purchases[index])),
     );
-  }
-
-  void _removePurchase(int index) {
-    setState(() {
-      _purchases.removeAt(index);
-    });
-    _useCase.remove(_purchases[index].id);
   }
 
   Widget _purchaseCard(Purchase purchase) => Card(

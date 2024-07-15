@@ -13,7 +13,7 @@ class Purchase {
 
   Purchase(this.id, this.pesticide, this.quantity, this.price);
 
-  Purchase.withIdGeneration(this.pesticide, this.quantity, this.price)
+  Purchase.autogenerateId(this.pesticide, this.quantity, this.price)
       : id = const Uuid().v1();
 
   /// creates Treatment starting from [json]
