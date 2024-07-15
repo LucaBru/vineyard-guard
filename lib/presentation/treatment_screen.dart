@@ -47,6 +47,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           itemCount: treatments.length,
           itemBuilder: (context, index) => Dismissible(
               key: ValueKey(index),
+              background: Container(
+                color: Colors.red,
+              ),
               child: _treatmentCard(treatments[index]),
               onDismissed: (_) {
                 setState(() {

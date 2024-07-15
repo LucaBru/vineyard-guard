@@ -13,6 +13,7 @@ class PurchaseScreen extends StatefulWidget {
 }
 
 class _PurchaseScreenState extends State<PurchaseScreen> {
+  final PurchaseUseCase _useCase = PurchaseUseCase();
   late Future<List<Purchase>> _request;
   late List<Purchase> _purchases;
 
@@ -31,7 +32,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         body: _futureWidget(context),
       );
 
-  Future<List<Purchase>> _fetchPurchases() => PurchaseUseCase().purchases();
+  Future<List<Purchase>> _fetchPurchases() => _useCase.purchases();
 
   void _purchasePesticide() async {
     PurchaseRequest request = await Navigator.push(
@@ -39,13 +40,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         MaterialPageRoute(
           builder: (context) => const AddPurchaseForm(),
         ));
-    PurchaseUseCase().add(request.pesticide,
+
+    Purchase p = Purchase.withIdGeneration(request.pesticide,
         Quantity(request.amount, request.unit), request.price);
+    _useCase.add(p);
     setState(() {
-      _purchases.insert(
-          0,
-          Purchase(request.pesticide, Quantity(request.amount, request.unit),
-              request.price));
+      _purchases.insert(0, p);
     });
   }
 
@@ -63,8 +63,20 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     return ListView.builder(
       itemCount: _purchases.length,
       itemBuilder: (context, index) => Dismissible(
-          key: ValueKey(index), child: _purchaseCard(_purchases[index])),
+          background: Container(
+            color: Colors.red,
+          ),
+          key: ValueKey(_purchases[index].id),
+          onDismissed: (_) => _removePurchase(index),
+          child: _purchaseCard(_purchases[index])),
     );
+  }
+
+  void _removePurchase(int index) {
+    setState(() {
+      _purchases.removeAt(index);
+    });
+    _useCase.remove(_purchases[index].id);
   }
 
   Widget _purchaseCard(Purchase purchase) => Card(

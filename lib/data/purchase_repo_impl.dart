@@ -6,18 +6,17 @@ class PurchaseRepoImpl extends PurchaseRepo {
   final CollectionReference _purchasesRef = FirebaseFirestore.instance
       .collection('purchase')
       .withConverter<Purchase>(
-          fromFirestore: (snapshot, _) => Purchase.fromJson(snapshot.data()!),
+          fromFirestore: (snapshot, _) =>
+              Purchase.fromJson({"id": snapshot.id, ...snapshot.data()!}),
           toFirestore: (purchase, _) => purchase.toJson());
 
   @override
-  void add(Purchase p) async => await _purchasesRef.add(p);
+  void add(Purchase p) => _purchasesRef.add(p);
 
   @override
   Future<List<Purchase>> purchases() => _purchasesRef.get().then(
       (s) => s.docs.map((snapshot) => snapshot.data()! as Purchase).toList());
 
   @override
-  void remove(Purchase p) {
-    // TODO: implement remove
-  }
+  void remove(String id) => _purchasesRef.doc(id).delete();
 }
