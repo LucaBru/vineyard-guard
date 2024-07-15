@@ -80,13 +80,8 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   Widget _purchaseCard(Purchase purchase) => Card(
           child: ListTile(
         title: Text(purchase.pesticide),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-                'Quantity: ${purchase.quantity.value} ${purchase.quantity.unit.name}, Price: ${purchase.price}')
-          ],
-        ),
+        subtitle: Text(
+            'Quantity: ${purchase.quantity.value} ${purchase.quantity.unit.name}, Price: ${purchase.price}'),
       ));
 }
 
