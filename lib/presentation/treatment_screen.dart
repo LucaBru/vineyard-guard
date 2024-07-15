@@ -12,8 +12,10 @@ class TreatmentScreen extends StatefulWidget {
 }
 
 class _TreatmentScreenState extends State<TreatmentScreen> {
+  late Future<List<Treatment>> _request;
+
   Future<List<Treatment>> _fetchTreatments() async =>
-      TreatmentUseCase().treatments();
+      _request = TreatmentUseCase().treatments();
 
   @override
   void initState() {
@@ -32,16 +34,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       onPressed: () => throw UnimplementedError());
 
   Widget _futureWidget(BuildContext context) => FutureBuilder(
-        future: _fetchTreatments(),
-        builder: (context, snapshot) {
-          return switch (snapshot.connectionState) {
+      future: _request,
+      builder: (context, snapshot) => switch (snapshot.connectionState) {
             ConnectionState.waiting => const Text(''),
             ConnectionState.done =>
               _treatmentsList(snapshot.data ?? [], context),
             _ => const CustomErrorWidget()
-          };
-        },
-      );
+          });
 
   Widget _treatmentsList(List<Treatment> treatments, BuildContext context) =>
       ListView.builder(

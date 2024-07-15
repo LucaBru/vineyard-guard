@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:vineyard_guard/firebase_options.dart';
-import 'package:vineyard_guard/presentation/purchase_screen.dart';
+import 'package:vineyard_guard/presentation/purchase/purchase_screen.dart';
 import 'package:vineyard_guard/presentation/treatment_screen.dart';
 import 'package:vineyard_guard/presentation/warehouse_screen.dart';
 import 'package:vineyard_guard/presentation/weather_screen.dart';
@@ -42,11 +42,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final labels = ['Treatments', 'Warehouse', 'Purchases', 'Weather'];
+    final labels = ['Treatments', 'Purchases', 'Warehouse', 'Weather'];
     final icons = [
       Icons.agriculture,
-      Icons.warehouse,
       Icons.shopping_cart,
+      Icons.warehouse,
       Icons.thunderstorm
     ];
 
@@ -68,8 +68,8 @@ class _HomePageState extends State<HomePage> {
         ),
         body: <Widget>[
           const TreatmentScreen(),
-          const WarehouseScreen(),
           const PurchaseScreen(),
+          const WarehouseScreen(),
           const WeatherScreen(),
         ][currentPageIndex]);
   }

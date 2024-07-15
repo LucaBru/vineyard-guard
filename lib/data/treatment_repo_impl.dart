@@ -11,14 +11,12 @@ class TreatmentRepoImpl extends TreatmentRepo {
           toFirestore: (treatment, _) => treatment.toJson());
 
   @override
-  void add(Treatment t) {
-    _treatmentsRef.add(t);
-  }
+  void add(Treatment t) async => await _treatmentsRef.add(t);
 
   @override
   void remove(Treatment t) {}
 
   @override
-  Future<List<Treatment>> treatments() async => await _treatmentsRef.get().then(
+  Future<List<Treatment>> treatments() => _treatmentsRef.get().then(
       (s) => s.docs.map((snapshot) => snapshot.data()! as Treatment).toList());
 }
