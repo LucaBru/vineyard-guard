@@ -1,8 +1,8 @@
-import 'package:vineyard_guard/domain/shared_type.dart';
+import 'package:vineyard_guard/domain/entity/quantity.dart';
 
 class Purchase {
   final int id;
-  final Pesticide pesticide;
+  final String pesticide;
   final Quantity quantity;
   final double price;
 

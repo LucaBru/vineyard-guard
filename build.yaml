@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      source_gen:combining_builder:
+        options:
+          build_extensions:
+            '^lib/domain/entity/{{}}.dart': 'lib/domain/entity/generated/{{}}.g.dart'

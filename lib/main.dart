@@ -18,9 +18,10 @@ class VineyardGuardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AgriAdmin',
+      title: 'VineyardGuard',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 110, 174, 37)),
         useMaterial3: true,
       ),
       darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
         bottomNavigationBar: NavigationBar(
-          indicatorColor: Theme.of(context).colorScheme.onInverseSurface,
+          indicatorColor: Theme.of(context).colorScheme.primaryContainer,
           onDestinationSelected: (int index) {
             setState(() {
               currentPageIndex = index;
