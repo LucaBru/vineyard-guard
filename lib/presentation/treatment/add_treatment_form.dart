@@ -69,7 +69,7 @@ class AddTreatmentFormState extends State<AddTreatmentForm> {
                   ));
                 } else {
                   Navigator.pop(context, (
-                    date: DateTime.parse(_dateController.text),
+                    date: _dateFormatter.parse(_dateController.text),
                     pesticides: pesticides
                   ));
                 }

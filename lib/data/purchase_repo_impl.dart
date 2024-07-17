@@ -11,7 +11,7 @@ class PurchaseRepoImpl extends PurchaseRepo {
           toFirestore: (purchase, _) => purchase.toJson());
 
   @override
-  void add(Purchase p) => _purchasesRef.add(p);
+  void add(Purchase p) => _purchasesRef.doc(p.id).set(p);
 
   @override
   Future<List<Purchase>> purchases() => _purchasesRef.get().then(

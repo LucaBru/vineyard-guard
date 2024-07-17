@@ -11,7 +11,8 @@ class TreatmentRepoImpl extends TreatmentRepo {
           toFirestore: (treatment, _) => treatment.toJson());
 
   @override
-  void add(Treatment t) => _treatmentsRef.add(t);
+  void add(Treatment t) =>
+      _treatmentsRef.doc(t.id).set(t);
 
   @override
   void remove(String id) => _treatmentsRef.doc(id).delete();
