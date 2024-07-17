@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:vineyard_guard/firebase_options.dart';
 import 'package:vineyard_guard/presentation/purchase/purchase_screen.dart';
-import 'package:vineyard_guard/presentation/treatment_screen.dart';
+import 'package:vineyard_guard/presentation/treatment/treatment_screen.dart';
 import 'package:vineyard_guard/presentation/warehouse_screen.dart';
 import 'package:vineyard_guard/presentation/weather_screen.dart';
 

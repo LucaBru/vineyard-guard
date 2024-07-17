@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vineyard_guard/domain/entity/quantity.dart';
 import 'package:vineyard_guard/domain/entity/treatment.dart';
 import 'package:vineyard_guard/domain/use_case/treatment_uc.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
+import 'package:vineyard_guard/presentation/treatment/add_treatment_form.dart';
 
 class TreatmentScreen extends StatefulWidget {
   const TreatmentScreen({super.key});
@@ -14,6 +16,7 @@ class TreatmentScreen extends StatefulWidget {
 class _TreatmentScreenState extends State<TreatmentScreen> {
   final TreatmentUseCase _useCase = TreatmentUseCase();
   late Future<List<Treatment>> _request;
+  late List<Treatment> _treatments;
 
   Future<List<Treatment>> _fetchTreatments() async =>
       _request = _useCase.treatments();
@@ -31,33 +34,50 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       );
 
   Widget _floatingButton() => FloatingActionButton(
-      child: const Icon(Icons.add),
-      onPressed: () => throw UnimplementedError());
+      onPressed: _doTreatment, child: const Icon(Icons.add));
+
+  void _doTreatment() async {
+    TreatmentRequest request = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AddTreatmentForm(),
+        ));
+
+    Treatment t = Treatment.autogenerateId(request.date, request.pesticides);
+    _useCase.add(t);
+    setState(() {
+      _treatments.insert(0, t);
+    });
+  }
 
   Widget _futureWidget(BuildContext context) => FutureBuilder(
       future: _request,
       builder: (context, snapshot) => switch (snapshot.connectionState) {
             ConnectionState.waiting => const Text(''),
-            ConnectionState.done =>
-              _treatmentsList(snapshot.data ?? [], context),
+            ConnectionState.done => _successfulRequest(snapshot, context),
             _ => const CustomErrorWidget()
           });
 
-  Widget _treatmentsList(List<Treatment> treatments, BuildContext context) =>
-      ListView.builder(
-          itemCount: treatments.length,
-          itemBuilder: (context, index) => Dismissible(
-              key: ValueKey(treatments[index].id),
-              background: Container(
-                color: Colors.red,
-              ),
-              child: _treatmentCard(treatments[index]),
-              onDismissed: (_) {
-                _useCase.remove(treatments[index].id);
-                setState(() {
-                  treatments.removeAt(index);
-                });
-              }));
+  Widget _successfulRequest(
+      AsyncSnapshot<List<Treatment>> snapshot, BuildContext context) {
+    _treatments = snapshot.data ?? [];
+    _treatments.sort((a, b) => b.date.compareTo(a.date));
+    return ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _treatments.length,
+        itemBuilder: (context, index) => Dismissible(
+            key: ValueKey(_treatments[index].id),
+            background: Container(
+              color: Colors.red,
+            ),
+            child: _treatmentCard(_treatments[index]),
+            onDismissed: (_) {
+              _useCase.remove(_treatments[index].id);
+              setState(() {
+                _treatments.removeAt(index);
+              });
+            }));
+  }
 
   Widget _treatmentCard(Treatment treatment) => Card(
           child: ExpansionTile(
@@ -71,3 +91,5 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             .toList(),
       ));
 }
+
+typedef TreatmentRequest = ({DateTime date, Map<String, Quantity> pesticides});
