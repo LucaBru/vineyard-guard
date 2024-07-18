@@ -17,14 +17,15 @@ class AddPurchaseFormState extends State<AddPurchaseForm> {
   UnitOfMeasure _unit = UnitOfMeasure.KG;
   late double _price;
 
-  final formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   AddPurchaseFormState();
 
   @override
   Widget build(BuildContext context) => Scaffold(
-          body: Form(
-        key: formKey,
+      appBar: AppBar(title: const Text("Insert purchase")),
+      body: Form(
+        key: _formKey,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -66,8 +67,8 @@ class AddPurchaseFormState extends State<AddPurchaseForm> {
 
   Widget _addButton() => ElevatedButton(
         onPressed: () {
-          if (formKey.currentState!.validate()) {
-            formKey.currentState?.save();
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState?.save();
             Navigator.pop(context, (
               pesticide: _pesticide,
               price: _price,

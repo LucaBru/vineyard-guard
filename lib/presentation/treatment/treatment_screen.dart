@@ -29,6 +29,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text("Vineyard treatments")),
         floatingActionButton: _floatingButton(),
         body: _futureWidget(context),
       );

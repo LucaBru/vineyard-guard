@@ -25,6 +25,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text("Pesticide purchases")),
         floatingActionButton: FloatingActionButton(
           onPressed: _purchasePesticide,
           child: const Icon(Icons.add),

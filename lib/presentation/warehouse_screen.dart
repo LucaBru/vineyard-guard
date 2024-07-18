@@ -23,6 +23,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text("Stocked pesticides")),
         body: FutureBuilder(
           future: _request,
           builder: (context, snapshot) => switch (snapshot.connectionState) {
