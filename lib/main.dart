@@ -20,11 +20,14 @@ class VineyardGuardApp extends StatelessWidget {
     return MaterialApp(
       title: 'VineyardGuard',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 110, 174, 37)),
         useMaterial3: true,
+        colorSchemeSeed: Color.fromARGB(186, 32, 221, 79),
       ),
-      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorSchemeSeed: Color.fromARGB(255, 8, 63, 22),
+      ),
       home: const HomePage(),
     );
   }

@@ -31,7 +31,9 @@ class AddTreatmentFormState extends State<AddTreatmentForm> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text("Insert treatment")),
+      appBar: AppBar(
+          title: const Text("Insert treatment"),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,

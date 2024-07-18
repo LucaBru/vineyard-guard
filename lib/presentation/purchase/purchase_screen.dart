@@ -25,7 +25,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text("Pesticide purchases")),
+        appBar: AppBar(
+          title: const Text("Pesticide purchases"),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: _purchasePesticide,
           child: const Icon(Icons.add),
@@ -61,28 +64,38 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   Widget _successfulRequest(
       AsyncSnapshot<List<Purchase>> snapshot, BuildContext context) {
     _purchases = snapshot.data ?? [];
-    return ListView.builder(
-      itemCount: _purchases.length,
-      itemBuilder: (context, index) => Dismissible(
-          background: Container(
-            color: Colors.red,
-          ),
-          key: ValueKey(_purchases[index].id),
-          onDismissed: (_) {
-            setState(() {
-              _purchases.removeAt(index);
-            });
-            _useCase.remove(_purchases[index].id);
-          },
-          child: _purchaseCard(_purchases[index])),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0,4,0,0),
+      child: ListView.builder(
+        itemCount: _purchases.length,
+        itemBuilder: (context, index) => Dismissible(
+            background: Container(
+              color: Colors.red,
+            ),
+            key: ValueKey(_purchases[index].id),
+            onDismissed: (_) {
+              setState(() {
+                _purchases.removeAt(index);
+              });
+              _useCase.remove(_purchases[index].id);
+            },
+            child: _purchaseCard(_purchases[index])),
+      ),
     );
   }
 
-  Widget _purchaseCard(Purchase purchase) => Card(
+  Widget _purchaseCard(Purchase purchase) => Card.filled(
           child: ListTile(
+        leading: const Icon(Icons.medication),
         title: Text(purchase.pesticide),
-        subtitle: Text(
-            'Quantity: ${purchase.quantity.value} ${purchase.quantity.unit.name}, Price: ${purchase.price}'),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Quantity: ${purchase.quantity.value} ${purchase.quantity.unit.name}'),
+            Text('Price: ${purchase.price} €'),
+          ],
+        ),
       ));
 }
 

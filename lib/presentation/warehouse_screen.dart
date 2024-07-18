@@ -23,7 +23,9 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text("Stocked pesticides")),
+        appBar: AppBar(
+            title: const Text("Stocked pesticides"),
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer),
         body: FutureBuilder(
           future: _request,
           builder: (context, snapshot) => switch (snapshot.connectionState) {
@@ -43,27 +45,39 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
     ]);
   }
 
-  Widget _pieChart() => Card(
-        child: SfCircularChart(
-            legend: const Legend(isVisible: true),
-            series: <CircularSeries>[
-              DoughnutSeries<StockedPesticide, String>(
-                  dataSource: _stocks,
-                  animationDuration: 0,
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                  ),
-                  dataLabelMapper: (StockedPesticide slice, _) =>
-                      '${slice.available} ${slice.unit.name}',
-                  xValueMapper: (StockedPesticide slice, _) => slice.pesticide,
-                  yValueMapper: (StockedPesticide slice, _) => slice.available),
-            ]),
+  Widget _pieChart() => Padding(
+        padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+        child: Card.filled(
+          child: SfCircularChart(
+              title: const ChartTitle(text: 'Stocks'),
+              legend: const Legend(isVisible: true),
+              series: <CircularSeries>[
+                DoughnutSeries<StockedPesticide, String>(
+                    dataSource: _stocks,
+                    animationDuration: 0,
+                    dataLabelSettings: const DataLabelSettings(
+                      isVisible: true,
+                    ),
+                    dataLabelMapper: (StockedPesticide slice, _) =>
+                        '${slice.available} ${slice.unit.name}',
+                    xValueMapper: (StockedPesticide slice, _) =>
+                        slice.pesticide,
+                    yValueMapper: (StockedPesticide slice, _) =>
+                        slice.available),
+              ]),
+        ),
       );
 
-  Widget _stockCard(StockedPesticide stock) => Card(
+  Widget _stockCard(StockedPesticide stock) => Card.filled(
         child: ListTile(
+            leading: const Icon(Icons.inventory),
             title: Text(stock.pesticide),
-            subtitle:
-                Text('Purchased: ${stock.purchased}, Used: ${stock.used}')),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Purchased: ${stock.purchased}'),
+                Text('Used: ${stock.used}'),
+              ],
+            )),
       );
 }

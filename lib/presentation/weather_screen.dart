@@ -24,8 +24,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Weather since last treatment'),),
-          body: FutureBuilder(
+      appBar: AppBar(
+          title: const Text('Weather since last treatment'),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer),
+      body: FutureBuilder(
         future: _request,
         builder: (context, snapshot) => switch (snapshot.connectionState) {
           ConnectionState.waiting => const Text(''),
@@ -38,63 +40,45 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _weather = snapshot.data ?? [];
     return ListView(
       children: [
-        _weatherOverview(),
+        const Padding(padding: const EdgeInsets.fromLTRB(0, 4, 0, 0)),
+        _averagePropertyWidget(
+            Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
+            _propertyAverage((w) => w.maxTemperature),
+            'Average max temperature',
+            '˚'),
+        _averagePropertyWidget(
+            Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
+            _propertyAverage((w) => w.minTemperature),
+            'Average min temperature',
+            '˚'),
+        _averagePropertyWidget(
+            const Icon(
+              Icons.thunderstorm,
+              size: 28,
+            ),
+            _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
+            'Precipitation sum',
+            'mm'),
         _precipitationChart(),
         _temperaturesChart()
       ],
     );
   }
 
-  _weatherOverview() => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: Column(children: [
-            _averagePropertyWidget(
-                Icons.sunny,
-                _propertyAverage((w) => w.maxTemperature),
-                'Average max temperature',
-                '˚'),
-            _averagePropertyWidget(
-                Icons.ac_unit,
-                _propertyAverage((w) => w.minTemperature),
-                'Average min temperature',
-                '˚'),
-            _averagePropertyWidget(
-                Icons.thunderstorm,
-                _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
-                'rains',
-                'mm')
-          ]),
-        ),
-      );
-
   _propertyAverage(double Function(Weather) retrieveProperty) =>
       (_weather.map(retrieveProperty).reduce((a, b) => a + b) /
           _weather.length);
 
   _averagePropertyWidget(
-          IconData icon, double value, String propertyName, String unit) =>
+          Icon icon, double value, String propertyName, String unit) =>
       Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Theme.of(context).cardColor, Colors.blue[100]!],
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
+        color: Theme.of(context).colorScheme.primaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icon,
-                size: 28,
-                color: Colors.white,
-              ),
+              icon,
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -106,16 +90,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         child: Text(
                           '${value.toStringAsFixed(1)} $unit',
                           style: const TextStyle(
-                            color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(2, 2),
-                                blurRadius: 4,
-                              ),
-                            ],
                           ),
                         ),
                       ),
@@ -128,41 +104,36 @@ class _WeatherScreenState extends State<WeatherScreen> {
         ),
       );
 
-  _precipitationChart() => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: SfCartesianChart(
-              title: const ChartTitle(text: 'Precipitation'),
-              primaryXAxis: _getDateTimeAxis(),
-              primaryYAxis: const NumericAxis(),
-              series: [
-                ColumnSeries<({DateTime day, double precipitation}), DateTime>(
-                    dataSource: _weather
-                        .map(
-                            (w) => (day: w.day, precipitation: w.precipitation))
-                        .toList(),
-                    animationDuration: 0,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(5)),
-                    xValueMapper: (data, _) => data.day,
-                    yValueMapper: (data, _) => data.precipitation,
-                    name: 'Gold',
-                    color: const Color.fromRGBO(8, 142, 255, 1))
-              ]),
-        ),
+  _precipitationChart() => Card.filled(
+        child: SfCartesianChart(
+            title: const ChartTitle(text: 'Precipitations'),
+            primaryXAxis: _getDateTimeAxis(),
+            primaryYAxis: const NumericAxis(),
+            series: [
+              ColumnSeries<({DateTime day, double precipitation}), DateTime>(
+                  dataSource: _weather
+                      .map((w) => (day: w.day, precipitation: w.precipitation))
+                      .toList(),
+                  animationDuration: 0,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(5)),
+                  xValueMapper: (data, _) => data.day,
+                  yValueMapper: (data, _) => data.precipitation,
+                  name: 'Gold',
+                  color: const Color.fromRGBO(8, 142, 255, 1))
+            ]),
       );
 
-  _temperaturesChart() => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: SfCartesianChart(
-              primaryXAxis: _getDateTimeAxis(),
-              primaryYAxis: const NumericAxis(labelFormat: '{value}°'),
-              title: const ChartTitle(text: 'Temperature'),
-              legend: const Legend(isVisible: true),
-              series: <CartesianSeries<({DateTime day, double temp}),
-                  DateTime>>[_maxTempSerie(), _minTempSerie()]),
-        ),
+  _temperaturesChart() => Card.filled(
+        child: SfCartesianChart(
+            primaryXAxis: _getDateTimeAxis(),
+            primaryYAxis: const NumericAxis(labelFormat: '{value}°'),
+            title: const ChartTitle(text: 'Temperatures'),
+            legend: const Legend(isVisible: true),
+            series: <CartesianSeries<({DateTime day, double temp}), DateTime>>[
+              _maxTempSerie(),
+              _minTempSerie()
+            ]),
       );
 
   _maxTempSerie() => AreaSeries(

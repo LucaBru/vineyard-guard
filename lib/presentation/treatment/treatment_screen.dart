@@ -29,7 +29,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text("Vineyard treatments")),
+        appBar: AppBar(
+          title: const Text("Vineyard treatments"),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        ),
         floatingActionButton: _floatingButton(),
         body: _futureWidget(context),
       );
@@ -63,32 +66,45 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       AsyncSnapshot<List<Treatment>> snapshot, BuildContext context) {
     _treatments = snapshot.data ?? [];
     _treatments.sort((a, b) => b.date.compareTo(a.date));
-    return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _treatments.length,
-        itemBuilder: (context, index) => Dismissible(
-            key: ValueKey(_treatments[index].id),
-            background: Container(
-              color: Colors.red,
-            ),
-            child: _treatmentCard(_treatments[index]),
-            onDismissed: (_) {
-              _useCase.remove(_treatments[index].id);
-              setState(() {
-                _treatments.removeAt(index);
-              });
-            }));
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+      child: ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _treatments.length,
+          itemBuilder: (context, index) => Dismissible(
+              key: ValueKey(_treatments[index].id),
+              background: Container(
+                color: Colors.red,
+              ),
+              child: _treatmentCard(_treatments[index]),
+              onDismissed: (_) {
+                _useCase.remove(_treatments[index].id);
+                setState(() {
+                  _treatments.removeAt(index);
+                });
+              })),
+    );
   }
 
-  Widget _treatmentCard(Treatment treatment) => Card(
+  Widget _treatmentCard(Treatment treatment) => Card.filled(
           child: ExpansionTile(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        leading: const Icon(Icons.engineering),
         title: Text(DateFormat('EEEE d MMMM y').format(treatment.date)),
+        shape: const Border(),
         children: treatment.pesticides.entries
-            .map((entry) => Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                      '${entry.key}: ${entry.value.value} ${entry.value.unit.name}'),
-                ))
+            .map(
+              (entry) => ListTile(
+                tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                leading: const Icon(Icons.medication),
+                title: Row(
+                  children: [
+                    Text(
+                        '${entry.key}: ${entry.value.value} ${entry.value.unit.name}'),
+                  ],
+                ),
+              ),
+            )
             .toList(),
       ));
 }

@@ -23,7 +23,9 @@ class AddPurchaseFormState extends State<AddPurchaseForm> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text("Insert purchase")),
+      appBar: AppBar(
+          title: const Text("Insert purchase"),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer),
       body: Form(
         key: _formKey,
         child: Padding(
