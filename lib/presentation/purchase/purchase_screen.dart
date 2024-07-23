@@ -56,16 +56,19 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   Widget _futureWidget(BuildContext context) => FutureBuilder(
       future: _request,
       builder: (context, snapshot) => switch (snapshot.connectionState) {
-            ConnectionState.waiting => const Text(''),
+            ConnectionState.waiting => const Center(
+                child: CircularProgressIndicator(),
+              ),
             ConnectionState.done => _successfulRequest(snapshot, context),
-            _ => const CustomErrorWidget()
+            _ => const CustomErrorWidget(
+                'Error while retrieving pesticide purchases')
           });
 
   Widget _successfulRequest(
       AsyncSnapshot<List<Purchase>> snapshot, BuildContext context) {
     _purchases = snapshot.data ?? [];
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0,4,0,0),
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
       child: ListView.builder(
         itemCount: _purchases.length,
         itemBuilder: (context, index) => Dismissible(
@@ -74,10 +77,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             ),
             key: ValueKey(_purchases[index].id),
             onDismissed: (_) {
+              _useCase.remove(_purchases[index].id);
               setState(() {
                 _purchases.removeAt(index);
               });
-              _useCase.remove(_purchases[index].id);
             },
             child: _purchaseCard(_purchases[index])),
       ),

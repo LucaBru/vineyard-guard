@@ -57,9 +57,11 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
   Widget _futureWidget(BuildContext context) => FutureBuilder(
       future: _request,
       builder: (context, snapshot) => switch (snapshot.connectionState) {
-            ConnectionState.waiting => const Text(''),
+            ConnectionState.waiting => const Center(
+                child: CircularProgressIndicator(),
+              ),
             ConnectionState.done => _successfulRequest(snapshot, context),
-            _ => const CustomErrorWidget()
+            _ => const CustomErrorWidget('Error while retrieving treatments')
           });
 
   Widget _successfulRequest(

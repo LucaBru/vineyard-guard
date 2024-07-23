@@ -10,13 +10,17 @@ class WeatherRepositoryImpl extends WeatherRepo {
 
   @override
   Future<List<Weather>> weatherSince(DateTime date) async {
+    int daysSinceLastTreatment = _daysSince(date);
+
+    if (daysSinceLastTreatment == 0) return [];
+
     var url = 'https://api.open-meteo.com/v1/forecast?';
     var params = {
       'latitude': '$latitude&',
       'longitude': '$longitude&',
       'daily': 'temperature_2m_max,temperature_2m_min,rain_sum&',
-      'past_days': '${_daysSince(date)}&',
-      'forecast_days': '1'
+      'past_days': '$daysSinceLastTreatment&',
+      'forecast_days': '0'
     };
 
     final response = await http.get(Uri.parse(url +

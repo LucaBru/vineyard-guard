@@ -135,9 +135,11 @@ class _AddPesticideFormState extends State<_AddPesticideForm> {
   Widget build(BuildContext context) => FutureBuilder(
       future: _request,
       builder: (context, snapshot) => switch (snapshot.connectionState) {
-            ConnectionState.waiting => const Text(''),
+            ConnectionState.waiting =>
+              const Center(child: CircularProgressIndicator()),
             ConnectionState.done => _successfulRequest(snapshot, context),
-            _ => const CustomErrorWidget()
+            _ => const CustomErrorWidget(
+                'Error while retrieving stocked pesticides')
           });
 
   _successfulRequest(AsyncSnapshot snapshot, BuildContext context) {

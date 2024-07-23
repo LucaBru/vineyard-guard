@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vineyard_guard/domain/entity/weather.dart';
@@ -30,39 +31,63 @@ class _WeatherScreenState extends State<WeatherScreen> {
       body: FutureBuilder(
         future: _request,
         builder: (context, snapshot) => switch (snapshot.connectionState) {
-          ConnectionState.waiting => const Text(''),
+          ConnectionState.waiting => const Center(
+              child: CircularProgressIndicator(),
+            ),
           ConnectionState.done => _successfulRequest(snapshot, context),
-          _ => const CustomErrorWidget()
+          _ => const CustomErrorWidget(
+              'Error while retrieving weather since last treatment')
         },
       ));
 
   _successfulRequest(AsyncSnapshot snapshot, BuildContext context) {
     _weather = snapshot.data ?? [];
-    return ListView(
-      children: [
-        const Padding(padding: const EdgeInsets.fromLTRB(0, 4, 0, 0)),
-        _averagePropertyWidget(
-            Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
-            _propertyAverage((w) => w.maxTemperature),
-            'Average max temperature',
-            '˚'),
-        _averagePropertyWidget(
-            Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
-            _propertyAverage((w) => w.minTemperature),
-            'Average min temperature',
-            '˚'),
-        _averagePropertyWidget(
-            const Icon(
-              Icons.thunderstorm,
-              size: 28,
-            ),
-            _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
-            'Precipitation sum',
-            'mm'),
-        _precipitationChart(),
-        _temperaturesChart()
-      ],
-    );
+
+    return (_weather.isEmpty)
+        ? Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(
+                Icons.hourglass_disabled,
+                color: Theme.of(context).colorScheme.error,
+                size: 26,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Text(
+                  'Not passed a day from last vineyard treatment, wait more time to see weather statistics',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+            ]),
+          )
+        : ListView(
+            children: [
+              const Padding(padding: const EdgeInsets.fromLTRB(0, 4, 0, 0)),
+              _averagePropertyWidget(
+                  Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
+                  _propertyAverage((w) => w.maxTemperature),
+                  'Average max temperature',
+                  '˚'),
+              _averagePropertyWidget(
+                  Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
+                  _propertyAverage((w) => w.minTemperature),
+                  'Average min temperature',
+                  '˚'),
+              _averagePropertyWidget(
+                  const Icon(
+                    Icons.thunderstorm,
+                    size: 28,
+                  ),
+                  _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
+                  'Precipitation sum',
+                  'mm'),
+              _precipitationChart(),
+              _temperaturesChart()
+            ],
+          );
   }
 
   _propertyAverage(double Function(Weather) retrieveProperty) =>

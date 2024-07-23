@@ -29,9 +29,12 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
         body: FutureBuilder(
           future: _request,
           builder: (context, snapshot) => switch (snapshot.connectionState) {
-            ConnectionState.waiting => const Text(''),
+            ConnectionState.waiting => const Center(
+                child: CircularProgressIndicator(),
+              ),
             ConnectionState.done => _successfulRequest(snapshot, context),
-            _ => const CustomErrorWidget()
+            _ => const CustomErrorWidget(
+                'Error while retrieving stocked pesticides')
           },
         ),
       );
@@ -40,7 +43,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
       AsyncSnapshot<List<StockedPesticide>> snapshot, BuildContext context) {
     _stocks = snapshot.data ?? [];
     return ListView(children: [
-      _pieChart(),
+      (_stocks.isEmpty) ? const Text('') : _pieChart(),
       ..._stocks.map((stock) => _stockCard(stock)),
     ]);
   }
