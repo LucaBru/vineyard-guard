@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:vineyard_guard/domain/entity/quantity.dart';
 import 'package:vineyard_guard/domain/entity/stocked_pesticide.dart';
 import 'package:vineyard_guard/domain/use_case/warehouse_uc.dart';
+import 'package:vineyard_guard/presentation/empty_list_widget.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
 import 'package:vineyard_guard/presentation/util.dart';
 
@@ -144,27 +145,34 @@ class _AddPesticideFormState extends State<_AddPesticideForm> {
 
   _successfulRequest(AsyncSnapshot snapshot, BuildContext context) {
     _stocks = snapshot.data ?? [];
-    return Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-              child: Divider(),
-            ),
-            _stocksDropdownMenu(),
-            _amountFormField(),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: _insertButton(),
-            ),
-            _pesticidesUsedList(),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-              child: Divider(),
-            ),
-          ],
-        ));
+    return switch ((_stocks, snapshot.hasError)) {
+      ([], false) => const Padding(
+        padding:  EdgeInsets.fromLTRB(0,25,0,25),
+        child:  EmptyListWidget('pesticide purchase'),
+      ),
+      (_, false) => Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                child: Divider(),
+              ),
+              _stocksDropdownMenu(),
+              _amountFormField(),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: _insertButton(),
+              ),
+              _pesticidesUsedList(),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Divider(),
+              ),
+            ],
+          )),
+      (_, true) => const CustomErrorWidget('Error while retrieving stocks')
+    };
   }
 
   _stocksDropdownMenu() => DropdownSearch<StockedPesticide>(

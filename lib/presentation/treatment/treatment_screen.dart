@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:vineyard_guard/domain/entity/quantity.dart';
 import 'package:vineyard_guard/domain/entity/treatment.dart';
 import 'package:vineyard_guard/domain/use_case/treatment_uc.dart';
+import 'package:vineyard_guard/presentation/empty_list_widget.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
 import 'package:vineyard_guard/presentation/treatment/add_treatment_form.dart';
 import 'package:share_plus/share_plus.dart';
@@ -84,24 +85,28 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       AsyncSnapshot<List<Treatment>> snapshot, BuildContext context) {
     _treatments = snapshot.data ?? [];
     _treatments.sort((a, b) => b.date.compareTo(a.date));
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-      child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _treatments.length,
-          itemBuilder: (context, index) => Dismissible(
-              key: ValueKey(_treatments[index].id),
-              background: Container(
-                color: Colors.red,
-              ),
-              child: _treatmentCard(_treatments[index]),
-              onDismissed: (_) {
-                _useCase.remove(_treatments[index].id);
-                setState(() {
-                  _treatments.removeAt(index);
-                });
-              })),
-    );
+    return switch ((_treatments, snapshot.hasError)) {
+      ([], false) => const EmptyListWidget('treatment'),
+      (_, false) => Padding(
+          padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+          child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _treatments.length,
+              itemBuilder: (context, index) => Dismissible(
+                  key: ValueKey(_treatments[index].id),
+                  background: Container(
+                    color: Colors.red,
+                  ),
+                  child: _treatmentCard(_treatments[index]),
+                  onDismissed: (_) {
+                    _useCase.remove(_treatments[index].id);
+                    setState(() {
+                      _treatments.removeAt(index);
+                    });
+                  })),
+        ),
+      (_, true) => const CustomErrorWidget('Error while retrieving treatments')
+    };
   }
 
   Widget _treatmentCard(Treatment treatment) => Card.filled(

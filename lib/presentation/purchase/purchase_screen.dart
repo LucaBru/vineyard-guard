@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vineyard_guard/domain/entity/purchase.dart';
 import 'package:vineyard_guard/domain/entity/quantity.dart';
 import 'package:vineyard_guard/domain/use_case/purchase_uc.dart';
+import 'package:vineyard_guard/presentation/empty_list_widget.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
 import 'package:vineyard_guard/presentation/purchase/add_purchase_form.dart';
 
@@ -67,24 +68,29 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   Widget _successfulRequest(
       AsyncSnapshot<List<Purchase>> snapshot, BuildContext context) {
     _purchases = snapshot.data ?? [];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-      child: ListView.builder(
-        itemCount: _purchases.length,
-        itemBuilder: (context, index) => Dismissible(
-            background: Container(
-              color: Colors.red,
-            ),
-            key: ValueKey(_purchases[index].id),
-            onDismissed: (_) {
-              _useCase.remove(_purchases[index].id);
-              setState(() {
-                _purchases.removeAt(index);
-              });
-            },
-            child: _purchaseCard(_purchases[index])),
-      ),
-    );
+    return switch ((_purchases, snapshot.hasError)) {
+      ([], false) => const EmptyListWidget('pesticide purchase'),
+      (_, false) => Padding(
+          padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+          child: ListView.builder(
+            itemCount: _purchases.length,
+            itemBuilder: (context, index) => Dismissible(
+                background: Container(
+                  color: Colors.red,
+                ),
+                key: ValueKey(_purchases[index].id),
+                onDismissed: (_) {
+                  _useCase.remove(_purchases[index].id);
+                  setState(() {
+                    _purchases.removeAt(index);
+                  });
+                },
+                child: _purchaseCard(_purchases[index])),
+          ),
+        ),
+      (_, true) =>
+        const CustomErrorWidget('Error while retrieving pesticide purchases')
+    };
   }
 
   Widget _purchaseCard(Purchase purchase) => Card.filled(

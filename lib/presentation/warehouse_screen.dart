@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vineyard_guard/domain/entity/stocked_pesticide.dart';
 import 'package:vineyard_guard/domain/use_case/warehouse_uc.dart';
+import 'package:vineyard_guard/presentation/empty_list_widget.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -42,10 +43,15 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
   Widget _successfulRequest(
       AsyncSnapshot<List<StockedPesticide>> snapshot, BuildContext context) {
     _stocks = snapshot.data ?? [];
-    return ListView(children: [
-      (_stocks.isEmpty) ? const Text('') : _pieChart(),
-      ..._stocks.map((stock) => _stockCard(stock)),
-    ]);
+    return switch ((_stocks, snapshot.hasError)) {
+      ([], false) => const EmptyListWidget('pesticide purchase'),
+      (_, false) => ListView(children: [
+          (_stocks.isEmpty) ? const Text('') : _pieChart(),
+          ..._stocks.map((stock) => _stockCard(stock)),
+        ]),
+      (_, true) =>
+        const CustomErrorWidget('Error while retrieving pesticide purchases')
+    };
   }
 
   Widget _pieChart() => Padding(

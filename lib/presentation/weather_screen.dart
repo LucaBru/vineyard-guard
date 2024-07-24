@@ -43,51 +43,53 @@ class _WeatherScreenState extends State<WeatherScreen> {
   _successfulRequest(AsyncSnapshot snapshot, BuildContext context) {
     _weather = snapshot.data ?? [];
 
-    return (_weather.isEmpty)
-        ? Center(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.hourglass_disabled,
-                color: Theme.of(context).colorScheme.error,
-                size: 26,
+    return switch ((_weather, snapshot.hasError)) {
+      ([], false) => Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(
+              Icons.hourglass_bottom,
+              color: Theme.of(context).colorScheme.error,
+              size: 80,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Text(
+                'Not passed a day from last vineyard treatment, wait more time to see weather statistics',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontWeight: FontWeight.bold),
               ),
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Text(
-                  'Not passed a day from last vineyard treatment, wait more time to see weather statistics',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                      fontWeight: FontWeight.bold),
+            )
+          ]),
+        ),
+      (_, false) => ListView(
+          children: [
+            const Padding(padding: const EdgeInsets.fromLTRB(0, 4, 0, 0)),
+            _averagePropertyWidget(
+                Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
+                _propertyAverage((w) => w.maxTemperature),
+                'Average max temperature',
+                '˚'),
+            _averagePropertyWidget(
+                Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
+                _propertyAverage((w) => w.minTemperature),
+                'Average min temperature',
+                '˚'),
+            _averagePropertyWidget(
+                const Icon(
+                  Icons.thunderstorm,
+                  size: 28,
                 ),
-              )
-            ]),
-          )
-        : ListView(
-            children: [
-              const Padding(padding: const EdgeInsets.fromLTRB(0, 4, 0, 0)),
-              _averagePropertyWidget(
-                  Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
-                  _propertyAverage((w) => w.maxTemperature),
-                  'Average max temperature',
-                  '˚'),
-              _averagePropertyWidget(
-                  Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
-                  _propertyAverage((w) => w.minTemperature),
-                  'Average min temperature',
-                  '˚'),
-              _averagePropertyWidget(
-                  const Icon(
-                    Icons.thunderstorm,
-                    size: 28,
-                  ),
-                  _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
-                  'Precipitation sum',
-                  'mm'),
-              _precipitationChart(),
-              _temperaturesChart()
-            ],
-          );
+                _weather.map((w) => w.precipitation).reduce((a, b) => a + b),
+                'Precipitation sum',
+                'mm'),
+            _precipitationChart(),
+            _temperaturesChart()
+          ],
+        ),
+      (_, true) =>
+        const CustomErrorWidget('Error while retrieving weather stats')
+    };
   }
 
   _propertyAverage(double Function(Weather) retrieveProperty) =>
