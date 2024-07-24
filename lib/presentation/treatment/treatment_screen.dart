@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vineyard_guard/domain/entity/quantity.dart';
@@ -5,6 +7,8 @@ import 'package:vineyard_guard/domain/entity/treatment.dart';
 import 'package:vineyard_guard/domain/use_case/treatment_uc.dart';
 import 'package:vineyard_guard/presentation/error_widget.dart';
 import 'package:vineyard_guard/presentation/treatment/add_treatment_form.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class TreatmentScreen extends StatefulWidget {
   const TreatmentScreen({super.key});
@@ -32,6 +36,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
         appBar: AppBar(
           title: const Text("Vineyard treatments"),
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          actions: [
+            IconButton(
+                onPressed: _shareTreatmentsPdf, icon: const Icon(Icons.share)),
+          ],
         ),
         floatingActionButton: _floatingButton(),
         body: _futureWidget(context),
@@ -39,6 +47,14 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
 
   Widget _floatingButton() => FloatingActionButton(
       onPressed: _doTreatment, child: const Icon(Icons.add));
+
+  Future<void> _shareTreatmentsPdf() async {
+    PdfDocument doc = await _useCase.pdf(_treatments);
+    Share.shareXFiles([
+      XFile.fromData(Uint8List.fromList(doc.saveSync()),
+          mimeType: 'application/pdf')
+    ]);
+  }
 
   void _doTreatment() async {
     TreatmentRequest request = await Navigator.push(
