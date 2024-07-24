@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vineyard_guard/domain/entity/quantity.dart';
 import 'package:vineyard_guard/domain/entity/stocked_pesticide.dart';
 import 'package:vineyard_guard/domain/use_case/warehouse_uc.dart';
 import 'package:vineyard_guard/presentation/empty_list_widget.dart';
@@ -46,8 +47,12 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
     return switch ((_stocks, snapshot.hasError)) {
       ([], false) => const EmptyListWidget('pesticide purchase'),
       (_, false) => ListView(children: [
-          (_stocks.isEmpty) ? const Text('') : _pieChart(),
-          ..._stocks.map((stock) => _stockCard(stock)),
+          _pieChart(),
+          Semantics(
+              label: 'List of stocked pesticides in the warehouse',
+              child: Column(
+                  children:
+                      _stocks.map((stock) => _stockCard(stock)).toList())),
         ]),
       (_, true) =>
         const CustomErrorWidget('Error while retrieving pesticide purchases')
@@ -57,35 +62,52 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
   Widget _pieChart() => Padding(
         padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
         child: Card.filled(
-          child: SfCircularChart(
-              title: const ChartTitle(text: 'Stocks'),
-              legend: const Legend(isVisible: true),
-              series: <CircularSeries>[
-                DoughnutSeries<StockedPesticide, String>(
-                    dataSource: _stocks,
-                    animationDuration: 0,
-                    dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                    ),
-                    dataLabelMapper: (StockedPesticide slice, _) =>
-                        '${slice.available} ${slice.unit.name}',
-                    xValueMapper: (StockedPesticide slice, _) =>
-                        slice.pesticide,
-                    yValueMapper: (StockedPesticide slice, _) =>
-                        slice.available),
-              ]),
+          child: Semantics(
+            label:
+                'Pie chart where each slice represent a stocked pesticide in the warehouse. Such information is also available in the list below',
+            child: ExcludeSemantics(
+              child: SfCircularChart(
+                  title: const ChartTitle(text: 'Stocks'),
+                  legend: const Legend(isVisible: true),
+                  series: <CircularSeries>[
+                    DoughnutSeries<StockedPesticide, String>(
+                        dataSource: _stocks,
+                        animationDuration: 0,
+                        dataLabelSettings: const DataLabelSettings(
+                          isVisible: true,
+                        ),
+                        dataLabelMapper: (StockedPesticide slice, _) =>
+                            '${slice.available} ${slice.unit.name}',
+                        xValueMapper: (StockedPesticide slice, _) =>
+                            slice.pesticide,
+                        yValueMapper: (StockedPesticide slice, _) =>
+                            slice.available),
+                  ]),
+            ),
+          ),
         ),
       );
 
   Widget _stockCard(StockedPesticide stock) => Card.filled(
         child: ListTile(
             leading: const Icon(Icons.inventory),
-            title: Text(stock.pesticide),
+            title: Text(
+              stock.pesticide,
+              semanticsLabel: 'Stock of ${stock.pesticide}',
+            ),
             subtitle: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Purchased: ${stock.purchased}'),
-                Text('Used: ${stock.used}'),
+                Text(
+                  'Purchased: ${stock.purchased} ${stock.unit.name}',
+                  semanticsLabel:
+                      'Purchased: ${stock.purchased} ${stock.unit == UnitOfMeasure.KG ? 'kilograms' : 'liters'}',
+                ),
+                Text(
+                  'Used: ${stock.used} ${stock.unit.name}',
+                  semanticsLabel:
+                      'Used:  ${stock.used} ${stock.unit == UnitOfMeasure.KG ? 'kilograms' : 'liters'}',
+                ),
               ],
             )),
       );

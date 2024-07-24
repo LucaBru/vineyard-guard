@@ -24,7 +24,7 @@ class AddPurchaseFormState extends State<AddPurchaseForm> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-          title: const Text("Insert purchase"),
+          title: const Text("Insert pesticide purchase"),
           backgroundColor: Theme.of(context).colorScheme.primaryContainer),
       body: Form(
         key: _formKey,
@@ -85,7 +85,7 @@ class AddPurchaseFormState extends State<AddPurchaseForm> {
   Widget _pesticideNameTextField() => TextFormField(
       decoration: const InputDecoration(
         icon: Icon(Icons.search),
-        labelText: 'Name',
+        labelText: 'Pesticide name',
       ),
       validator: (value) =>
           (value == null || value.isEmpty) ? 'Please enter some name' : null,

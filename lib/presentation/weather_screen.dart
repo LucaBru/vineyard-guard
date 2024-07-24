@@ -69,12 +69,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 Icon(Icons.sunny, size: 28, color: Colors.yellow[700]),
                 _propertyAverage((w) => w.maxTemperature),
                 'Average max temperature',
-                '˚'),
+                '˚',
+                'celsius degree'),
             _averagePropertyWidget(
                 Icon(Icons.ac_unit, size: 28, color: Colors.blue[600]),
                 _propertyAverage((w) => w.minTemperature),
                 'Average min temperature',
-                '˚'),
+                '˚',
+                'celsius degree'),
             _averagePropertyWidget(
                 const Icon(
                   Icons.thunderstorm,
@@ -97,7 +99,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
           _weather.length);
 
   _averagePropertyWidget(
-          Icon icon, double value, String propertyName, String unit) =>
+          Icon icon, double value, String propertyName, String unit,
+          [String? unitSemantics]) =>
       Card(
         color: Theme.of(context).colorScheme.primaryContainer,
         child: Padding(
@@ -116,6 +119,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
                         child: Text(
                           '${value.toStringAsFixed(1)} $unit',
+                          semanticsLabel:
+                              '${value.toStringAsFixed(1)} ${unitSemantics ?? unit}',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -132,38 +137,56 @@ class _WeatherScreenState extends State<WeatherScreen> {
       );
 
   _precipitationChart() => Card.filled(
-        child: SfCartesianChart(
-            title: const ChartTitle(text: 'Precipitations'),
-            primaryXAxis: _getDateTimeAxis(),
-            primaryYAxis: const NumericAxis(),
-            series: [
-              ColumnSeries<({DateTime day, double precipitation}), DateTime>(
-                  dataSource: _weather
-                      .map((w) => (day: w.day, precipitation: w.precipitation))
-                      .toList(),
-                  animationDuration: 0,
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(5)),
-                  xValueMapper: (data, _) => data.day,
-                  yValueMapper: (data, _) => data.precipitation,
-                  name: 'Gold',
-                  color: const Color.fromRGBO(8, 142, 255, 1))
-            ]),
+        child: Semantics(
+          label:
+              '''Bar chart that represent the precipitation in the days since last treatment until today, 
+              it shows that the rain were 
+              ${_weather.where((w) => w.precipitation > 0).map((w) => '${w.precipitation} mm on ${DateFormat('dd of MMMM').format(w.day)}')}''',
+          child: ExcludeSemantics(
+            child: SfCartesianChart(
+                title: const ChartTitle(text: 'Precipitations'),
+                primaryXAxis: _getDateTimeAxis(),
+                primaryYAxis: const NumericAxis(),
+                series: [
+                  ColumnSeries<({DateTime day, double precipitation}),
+                          DateTime>(
+                      dataSource: _weather
+                          .map((w) =>
+                              (day: w.day, precipitation: w.precipitation))
+                          .toList(),
+                      animationDuration: 0,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(5)),
+                      xValueMapper: (data, _) => data.day,
+                      yValueMapper: (data, _) => data.precipitation,
+                      name: 'Gold',
+                      color: const Color.fromRGBO(8, 142, 255, 1))
+                ]),
+          ),
+        ),
       );
 
   _temperaturesChart() => Card.filled(
-        child: SfCartesianChart(
-            primaryXAxis: _getDateTimeAxis(),
-            primaryYAxis: const NumericAxis(labelFormat: '{value}°'),
-            title: const ChartTitle(text: 'Temperatures'),
-            legend: const Legend(isVisible: true),
-            series: <CartesianSeries<({DateTime day, double temp}), DateTime>>[
-              _maxTempSerie(),
-              _minTempSerie()
-            ]),
+        child: Semantics(
+          label: '''
+            Line chart that represent the maximum and minimum temperatures in the days since last treatment until today,
+            it shows that the maximum temperatures were
+            ${_weather.map((w) => '${w.maxTemperature} on ${DateFormat('dd of MMMM').format(w.day)}')}
+            while the minimum temperatures were
+            ${_weather.map((w) => '${w.minTemperature} on ${DateFormat('dd of MMMM').format(w.day)}')}
+            ''',
+          child: ExcludeSemantics(
+            child: SfCartesianChart(
+                primaryXAxis: _getDateTimeAxis(),
+                primaryYAxis: const NumericAxis(labelFormat: '{value}°'),
+                title: const ChartTitle(text: 'Temperatures'),
+                legend: const Legend(isVisible: true),
+                series: [_maxTempSeries(), _minTempSeries()]),
+          ),
+        ),
       );
 
-  _maxTempSerie() => AreaSeries(
+  _maxTempSeries() => AreaSeries(
         animationDuration: 0,
         dataSource:
             _weather.map((w) => (day: w.day, temp: w.maxTemperature)).toList(),
@@ -175,7 +198,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         color: const Color.fromRGBO(255, 150, 0, 0.2),
       );
 
-  _minTempSerie() => AreaSeries(
+  _minTempSeries() => AreaSeries(
         animationDuration: 0,
         dataSource:
             _weather.map((w) => (day: w.day, temp: w.minTemperature)).toList(),

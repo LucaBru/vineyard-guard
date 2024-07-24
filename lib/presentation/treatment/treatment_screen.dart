@@ -39,7 +39,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           actions: [
             IconButton(
-                onPressed: _shareTreatmentsPdf, icon: const Icon(Icons.share)),
+                tooltip: 'Share treatments as pdf file',
+                onPressed: _shareTreatmentsPdf,
+                icon: const Icon(Icons.share)),
           ],
         ),
         floatingActionButton: _floatingButton(),
@@ -47,7 +49,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       );
 
   Widget _floatingButton() => FloatingActionButton(
-      onPressed: _doTreatment, child: const Icon(Icons.add));
+      tooltip: 'Add treatment',
+      onPressed: _doTreatment,
+      child: const Icon(Icons.add));
 
   Future<void> _shareTreatmentsPdf() async {
     PdfDocument doc = await _useCase.pdf(_treatments);
@@ -89,47 +93,57 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       ([], false) => const EmptyListWidget('treatment'),
       (_, false) => Padding(
           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-          child: ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _treatments.length,
-              itemBuilder: (context, index) => Dismissible(
-                  key: ValueKey(_treatments[index].id),
-                  background: Container(
-                    color: Colors.red,
-                  ),
-                  child: _treatmentCard(_treatments[index]),
-                  onDismissed: (_) {
-                    _useCase.remove(_treatments[index].id);
-                    setState(() {
-                      _treatments.removeAt(index);
-                    });
-                  })),
+          child: Semantics(
+            label: 'List of treatments',
+            child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _treatments.length,
+                itemBuilder: (context, index) => Dismissible(
+                    key: ValueKey(_treatments[index].id),
+                    background: Container(
+                      color: Colors.red,
+                    ),
+                    child: _treatmentCard(_treatments[index]),
+                    onDismissed: (_) {
+                      _useCase.remove(_treatments[index].id);
+                      setState(() {
+                        _treatments.removeAt(index);
+                      });
+                    })),
+          ),
         ),
       (_, true) => const CustomErrorWidget('Error while retrieving treatments')
     };
   }
 
-  Widget _treatmentCard(Treatment treatment) => Card.filled(
-          child: ExpansionTile(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        leading: const Icon(Icons.engineering),
-        title: Text(DateFormat('EEEE d MMMM y').format(treatment.date)),
-        shape: const Border(),
-        children: treatment.pesticides.entries
-            .map(
-              (entry) => ListTile(
-                tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                leading: const Icon(Icons.medication),
-                title: Row(
-                  children: [
-                    Text(
-                        '${entry.key}: ${entry.value.value} ${entry.value.unit.name}'),
-                  ],
-                ),
+  Widget _treatmentCard(Treatment treatment) {
+    String treatmentDateFormatted =
+        DateFormat('EEEE d MMMM y').format(treatment.date);
+    return Card.filled(
+        child: ExpansionTile(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      leading: const Icon(Icons.engineering),
+      title: Text(
+        treatmentDateFormatted,
+        semanticsLabel: 'Treatment of $treatmentDateFormatted',
+      ),
+      shape: const Border(),
+      children: treatment.pesticides.entries
+          .map(
+            (entry) => ListTile(
+              tileColor: Theme.of(context).colorScheme.surfaceContainer,
+              leading: const Icon(Icons.medication),
+              title: Row(
+                children: [
+                  Text(
+                      '${entry.key}: ${entry.value.value} ${entry.value.unit.name}'),
+                ],
               ),
-            )
-            .toList(),
-      ));
+            ),
+          )
+          .toList(),
+    ));
+  }
 }
 
 typedef TreatmentRequest = ({DateTime date, Map<String, Quantity> pesticides});
