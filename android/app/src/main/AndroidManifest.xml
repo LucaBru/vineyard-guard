@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="vineyard_guard"
+        android:label="VineyardGuard"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
