@@ -147,9 +147,9 @@ class _AddPesticideFormState extends State<_AddPesticideForm> {
     _stocks = snapshot.data ?? [];
     return switch ((_stocks, snapshot.hasError)) {
       ([], false) => const Padding(
-        padding:  EdgeInsets.fromLTRB(0,25,0,25),
-        child:  EmptyListWidget('pesticide purchase'),
-      ),
+          padding: EdgeInsets.fromLTRB(0, 25, 0, 25),
+          child: EmptyListWidget('pesticide purchase'),
+        ),
       (_, false) => Form(
           key: _formKey,
           child: Column(
@@ -254,10 +254,15 @@ class _AddPesticideFormState extends State<_AddPesticideForm> {
                     widget._pesticidesUsed.remove(entry.key);
                   });
                 },
-                child: Card(
+                child: Card.filled(
                   child: ListTile(
-                    title: Text(
-                        '${entry.key} ${entry.value.value} ${entry.value.unit.name}'),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text('${entry.key}'),
+                        Text(' ${entry.value.value} ${entry.value.unit.name}'),
+                      ],
+                    ),
                   ),
                 ),
               ))

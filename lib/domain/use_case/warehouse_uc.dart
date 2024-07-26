@@ -24,6 +24,6 @@ class WarehouseUseCase {
           (pesticide, quantity) => stocks[pesticide]?.used += quantity.value);
     }
 
-    return stocks.values.toList();
+    return stocks.values.where((stock) => stock.available > 0).toList();
   }
 }
